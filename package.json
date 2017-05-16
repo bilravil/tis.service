@@ -1,0 +1,14 @@
+{
+  "name": "tis.service.easyecg",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.15.2",
+    "log4js": "^1.1.1",
+    "request": "^2.81.0",
+    "underscore": "^1.8.3"
+  }
+}
