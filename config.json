@@ -1,0 +1,7 @@
+{
+	"port" : 8090,
+	"localservice": {
+	    "port": 8091
+	  }
+
+}
