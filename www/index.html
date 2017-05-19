@@ -1,19 +1,25 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8">
     <title>Телемедицинские Информационные Системы</title>
     <link rel="icon" type="image/png" href="./favicon.ico" />
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script>
+        var app = angular.module('App', []);
+        app.controller('IndexCtrl', function ($scope) {
+
+        });
+    </script>
 </head>
-<body>
+<body ng-app="App" ng-controller="IndexCtrl">
     <nav class="navbar navbar-default">
         <div class="container-fluid">
-            <div class="navbar-header">
+            <div class="navbar-header"> 
                 <p class="navbar-text ">Телемедицинские Информационные Системы</p>
             </div>
         </div>
@@ -31,43 +37,43 @@
             <div id="main" class="tab-pane fade in active">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox"> Мобильный Диагностический Комплекс
+                        <input type="checkbox" ng-model="mdc"> Мобильный Диагностический Комплекс
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox"> АТЕС МЕДИКА - EasyECG
+                        <input type="checkbox" ng-model="easyecg"> АТЕС МЕДИКА - EasyECG
                     </label>
                 </div>
                 <div class="form-group">
                     <label> Сервер</label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control"  ng-model="server">
                 </div>
                 <div class="form-group">
                     <label> Локальный порт</label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control" ng-model="port">
                 </div>
                 <button class="btn btn-primary" type="button">Применить</button>
             </div>
             <div id="mdc" class="tab-pane fade">
                 <div class="form-group">
                     <label> Серийный номер</label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control"  ng-model="mdcsernum">
                 </div>
                 <button class="btn btn-primary" type="button">Применить</button>
             </div>
             <div id="easyecg" class="tab-pane fade">
                 <div class="form-group">
                     <label> Серийный номер</label>
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control"  ng-model="easyecgsernum">
                 </div>
                 <div class="form-group">
                     <label>Входной каталог</label>
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-option-horizontal"></span></button>
-                            </span>
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-option-horizontal"></span></button>
+                        </span>
                     </div>
                 </div>
                 <div class="form-group">
