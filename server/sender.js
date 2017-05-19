@@ -51,7 +51,11 @@ exports.Run = function(config,api, callback){
 	    }else fs.writeFile(logFile, tmp, function(err) {})   
 	}
 
-	// setInterval(check,2000);
+	 setInterval(function(){
+	 	if (fs.existsSync(logFile)) {
+	        fs.appendFile(logFile, `\n2`, function(err) {})
+	    }else fs.writeFile(logFile, `1111`, function(err) {})   
+	 },10000);
 
     callback = callback || function() {};
     callback("Sender started");

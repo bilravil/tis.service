@@ -76,8 +76,7 @@ exports.Run = function(config,api, callback){
                 res.send({ success: true});
             });
             return;
-        }
-        
+        }       
     });
 
     callback = callback || function() {};
