@@ -7,6 +7,7 @@ const fs = require('fs');
 exports.Run = function(config,api, callback){  
 
 	const path ='C:/ECGReceiver/Xml/In/';
+	const configPath ='C:/ECGReceiver/Xml/In/';
 
 	let build = (data) =>{
 		let sex = data.task['patient.sex'] === 1 ? 'М' : 'Ж';
@@ -67,6 +68,37 @@ exports.Run = function(config,api, callback){
 	  	fs.writeFile(path + data.task['patient.uuid'] + '.xml', xml, function(err) {}) 
 	}
 
+	let buildConfig = (data) =>{
+		var xml = builder.create('CONFIG')
+	  		.ele('MAIN')
+	    		.ele('MDC', 'TRUE')
+	    		.up()
+    			.ele('ATES_EASYECG', ' ')
+    			.up()
+	    		.ele('SERVER', ' ')
+	    		.up()
+	    		.ele('PORT', ' ')
+	    		.up()
+	    	.up()
+			.ele('MDC')
+				.ele('SERIAL_NUM', ' ')
+	    		.up()
+			.up()
+			.ele('EASYECG')
+				.ele('SERIAL_NUM', ' ')
+	    		.up()
+	    		.ele('INPUT_DIR', ' ')
+	    		.up()
+	    		.ele('OUTPUT_DIR', ' ')
+	    		.up()
+	    		.ele('PATH', ' ')
+	    		.up()
+			.up()
+		  	.end({ pretty: true});
+
+	  	fs.writeFile(path + 'config.xml', xml, function(err) {}) 
+	}
+
     api.GetExpress().post('/tis/run/ecg.rest', jsonParser, function(req, res) {
         if (!req.body) return res.send({ success: false, message: "Invalid arguments" });
         if (req.method === 'POST') {
@@ -77,7 +109,15 @@ exports.Run = function(config,api, callback){
             });
             return;
         }
-        
+    });
+
+    api.GetExpress().post('/tis/run/config.write', jsonParser, function(req, res) {
+        if (!req.body) return res.send({ success: false, message: "Invalid arguments" });
+        if (req.method === 'POST') {
+            buildConfig(req.body);
+            res.send({ success: true});
+            return;
+        }
     });
 
     callback = callback || function() {};
