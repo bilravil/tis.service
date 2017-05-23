@@ -16,8 +16,8 @@ const http = require('http').Server(app);
 
 const config = require('./config.json');
 var fs = require('fs');
-const log4js = require('log4js');
-const logger = log4js.getLogger();
+const logger = require('./server/logger.js');
+
 const xmlbuilder = require('./server/xmlbuilder.js');
 const sender = require('./server/sender.js');
 
@@ -39,6 +39,7 @@ function Http(port, callback) {
             next();
         }
     });
+    
 
     app.use(cookieParser);
     app.use(sessionParser);
@@ -48,12 +49,20 @@ function Http(port, callback) {
     app.use(bodyParser.json({ limit: '50mb' }));
     app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));    
 
+    app.post('/tis/getLogs', jsonParser, function(req, res) {
+        if (!fs.existsSync('./logs.txt')) { res.send({ success: true , message : ''}); }
+            fs.readFile('./logs.txt', 'utf8', function(err, data) {
+                res.send({ success: true , message : data}); 
+            }); 
+    });
+
     http.listen(port, function () {
         (callback || function () { })();
     });
 }
 
-Http(config.port, function () { console.log('http service started on port ' + config.port + "!");  });
+
+Http(config.main.port, function () { console.log('http service started on port ' + config.main.port + "!");  });
 xmlbuilder.Run(config,api, function(){})
 sender.Run(config,api, function(){})
 
@@ -63,5 +72,5 @@ process.on('uncaughtException', function(err) {
 
 http.on('error', function(err) {
 	console.log(err);
-	logger.debug("error" + err);
+	logger.write(`Порт ${config.main.port} уже используется другой программой. `);
 });

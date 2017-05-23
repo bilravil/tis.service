@@ -1,7 +1,1 @@
-{
-	"port" : 8090,
-	"localservice": {
-	    "port": 8091
-	  }
-
-}
+{"main":{"server":"http://10.11.128.112:8084","port":"8090"},"easyecg":{"easyecgsernum":"612445","easyecginputdir":"C:/ECGReceiver/Xml/In","easyecgoutputdir":"C:/ECGReceiver/Out","easyecgpath":"C:\\Program Files (x86)\\ATES Medica\\Easy ECG Rest\\Bin\\ht_ecgv.exe"}}

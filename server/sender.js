@@ -4,8 +4,8 @@ const request = require('request');
 
 exports.Run = function(config,api, callback){  
 
-	const localFolder ='C:/ECGReceiver/Out/';
-	const remoteServer ='http://localhost:8084';
+	const localFolder = config.easyecg.easyecgoutputdir;
+	const remoteServer = config.main.server;
 
 	const logFile = localFolder + 'log.txt';
 
@@ -20,16 +20,18 @@ exports.Run = function(config,api, callback){
 		})
 	}
 
-	let send = (filepath) =>{   
+	let send = (filepath) => {   
+		api.GetLogger().write(`Обнаружен файл ЭКГ - ${filepath}`); 
         var url = remoteServer;
         var req = request.post({url: url }, function (err, remoteResponse, remoteBody) {
             if (err) {               
-                console.log(err);  
+                api.GetLogger().write(`Ошибка при отправке файла на сервер - ${err} . Проверьте адрес сервера в настройках.`);
                 return;              
             }          
         });
         var form = req.form();
-	    form.append('data', fs.createReadStream(filepath));    
+	    form.append('data', fs.createReadStream(filepath));   
+	    api.GetLogger().write(`Файл отправлен на сервер - ${filepath}`); 
 	    writeToFile(filepath);
 	}
 
@@ -51,11 +53,7 @@ exports.Run = function(config,api, callback){
 	    }else fs.writeFile(logFile, tmp, function(err) {})   
 	}
 
-	 setInterval(function(){
-	 	if (fs.existsSync(logFile)) {
-	        fs.appendFile(logFile, `\n2`, function(err) {})
-	    }else fs.writeFile(logFile, `1111`, function(err) {})   
-	 },10000);
+	setInterval(check,2000);
 
     callback = callback || function() {};
     callback("Sender started");

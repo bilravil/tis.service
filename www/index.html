@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8">
-    <title>Телемедицинские Информационные Системы</title>
+    <title>ТИС-Настройки</title>
     <link rel="icon" type="image/png" href="./favicon.ico" />
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -11,7 +11,46 @@
     <script src="bower_components/angular/angular.min.js"></script>
     <script>
         var app = angular.module('App', []);
-        app.controller('IndexCtrl', function ($scope) {
+        app.controller('IndexCtrl', function ($scope, $http) {
+
+            $scope.writeConfig = function(){
+                var request = {  
+                    server: $scope.server, 
+                    port: $scope.port,
+                    easyecgsernum: $scope.easyecgsernum,
+                    easyecginputdir: $scope.easyecginputdir,
+                    easyecgoutputdir: $scope.easyecgoutputdir,
+                    easyecgpath: $scope.easyecgpath
+                };
+                $http.post('/tis/writeConfig', request ).
+                    success(function (result, status, headers, config) {
+                        if (result.success != undefined && result.success == false) {
+                            $scope.message = result.message;return;
+                        }
+                    });
+            }
+            $scope.readConfig = function(){
+                var request = {};
+                $http.post('/tis/readConfig', request ).
+                    success(function (result, status, headers, config) {
+                            $scope.server = result.msg.main.server;
+                            $scope.port = result.msg.main.port;
+                            $scope.easyecgsernum = result.msg.easyecg.easyecgsernum;
+                            $scope.easyecginputdir = result.msg.easyecg.easyecginputdir;
+                            $scope.easyecgoutputdir = result.msg.easyecg.easyecgoutputdir;
+                            $scope.easyecgpath = result.msg.easyecg.easyecgpath;                    
+                    });
+                
+            }
+            $scope.readLog = function(){
+                $http.post('/tis/getLogs').
+                success(function (result, status, headers, config) {
+                       $scope.logs = result.message;               
+                });
+            }
+
+            $scope.readLog();
+            $scope.readConfig();
 
         });
     </script>
@@ -20,7 +59,7 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header"> 
-                <p class="navbar-text ">Телемедицинские Информационные Системы</p>
+                <p class="navbar-text ">Настройки службы для отправки ЭКГ</p>
             </div>
         </div>
     </nav>
@@ -28,23 +67,12 @@
         <div class="col-xs-3 col-xs-offset-1">
             <ul class="nav nav-pills nav-stacked">
                 <li class="active"><a data-toggle="pill" href="#main">Основные</a></li>
-                <li><a data-toggle="pill" href="#mdc">Мобильный Диагностический Комплекс</a></li>
                 <li><a data-toggle="pill" href="#easyecg">EasyECG</a></li>
-                <li><a data-toggle="pill" href="#logs">Логин</a></li>
+                <li><a data-toggle="pill" href="#logs">Логи</a></li>
             </ul>
         </div>
         <div class="tab-content col-xs-7">
             <div id="main" class="tab-pane fade in active">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" ng-model="mdc"> Мобильный Диагностический Комплекс
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" ng-model="easyecg"> АТЕС МЕДИКА - EasyECG
-                    </label>
-                </div>
                 <div class="form-group">
                     <label> Сервер</label>
                     <input type="text" class="form-control"  ng-model="server">
@@ -53,52 +81,31 @@
                     <label> Локальный порт</label>
                     <input type="text" class="form-control" ng-model="port">
                 </div>
-                <button class="btn btn-primary" type="button">Применить</button>
-            </div>
-            <div id="mdc" class="tab-pane fade">
-                <div class="form-group">
-                    <label> Серийный номер</label>
-                    <input type="text" class="form-control"  ng-model="mdcsernum">
-                </div>
-                <button class="btn btn-primary" type="button">Применить</button>
+                <button class="btn btn-primary" type="button" ng-click="writeConfig()">Применить</button>
             </div>
             <div id="easyecg" class="tab-pane fade">
                 <div class="form-group">
                     <label> Серийный номер</label>
-                    <input type="text" class="form-control"  ng-model="easyecgsernum">
+                    <input type="text" class="form-control" ng-model="easyecgsernum">
                 </div>
                 <div class="form-group">
-                    <label>Входной каталог</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-option-horizontal"></span></button>
-                        </span>
-                    </div>
+                    <label>Входной каталог</label>                   
+                    <input type="text" class="form-control" placeholder="" ng-model="easyecginputdir">                   
                 </div>
                 <div class="form-group">
                     <label>Выходной каталог</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-option-horizontal"></span></button>
-                        </span>
-                    </div>
+                    <input type="text" class="form-control" placeholder="" ng-model="easyecgoutputdir">
                 </div>
                 <div class="form-group">
                     <label>Путь к программе</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-option-horizontal"></span></button>
-                        </span>
-                    </div>
+                    <input type="text" class="form-control" placeholder="" ng-model="easyecgpath">
                 </div>
-                <button class="btn btn-primary" type="button">Применить</button>
+                <button class="btn btn-primary" type="button" ng-click="writeConfig()">Применить</button>
             </div>
             <div id="logs" class="tab-pane fade">
+                    <button class="btn btn-default" type="button" ng-click="readLog()" style = "margin-bottom:10px"><span class="glyphicon glyphicon-refresh"></span></button>
                 <div class="form-group">
-                    <textarea class="form-control" rows="10" readonly></textarea>
+                    <textarea class="form-control" rows="20" readonly ng-model = "logs"></textarea>
                 </div>
             </div>
         </div>

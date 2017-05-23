@@ -3,23 +3,27 @@ var bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const multiparty = require('multiparty');
 const fs = require('fs');
+const exec = require('child_process').execFile;
 
 exports.Run = function(config,api, callback){  
 
-	const path ='C:/ECGReceiver/Xml/In/';
-	const configPath ='C:/ECGReceiver/Xml/In/';
+	const path = config.easyecg.easyecginputdir;
+	const configPath ='./';
+	const atesExe = config.easyecg.easyecgpath;
 
-	let build = (data) =>{
+	let buildAtesXml = (data) =>{
 		let sex = data.task['patient.sex'] === 1 ? 'М' : 'Ж';
 		let tmp = data.task['patient.birthday'].toString();
-		let birthday = `${tmp.substring(6)}.${tmp.substring(4,6)}.${tmp.substring(0,4)}`
+		let birthday = `${tmp.substring(6)}.${tmp.substring(4,6)}.${tmp.substring(0,4)}`;
+		let full_name = `${data.task['patient.first']} ${data.task['patient.middle']} ${data.task['patient.last']}`;
+		api.GetLogger().write(`Начато обследование пациента - ${full_name}`);
 		var xml = builder.create('REQUEST').att('Type','PATIENT_ADD')
 	  		.ele('PATIENT_DATA').att('XML_VERSION','1.0')
 	    		.ele('PAT_DB_ID', '-1')
 	    		.up()
     			.ele('PAT_CODE', data.task['patient.uuid'])
     			.up()
-	    		.ele('PAT_FULL_NAME',`${data.task['patient.first']} ${data.task['patient.middle']} ${data.task['patient.last']}` )
+	    		.ele('PAT_FULL_NAME', full_name)
 	    		.up()
 	    		.ele('PAT_LAST_NAME', data.task['patient.first'])
 	    		.up()
@@ -69,34 +73,37 @@ exports.Run = function(config,api, callback){
 	}
 
 	let buildConfig = (data) =>{
-		var xml = builder.create('CONFIG')
-	  		.ele('MAIN')
-	    		.ele('MDC', 'TRUE')
-	    		.up()
-    			.ele('ATES_EASYECG', ' ')
-    			.up()
-	    		.ele('SERVER', ' ')
-	    		.up()
-	    		.ele('PORT', ' ')
-	    		.up()
-	    	.up()
-			.ele('MDC')
-				.ele('SERIAL_NUM', ' ')
-	    		.up()
-			.up()
-			.ele('EASYECG')
-				.ele('SERIAL_NUM', ' ')
-	    		.up()
-	    		.ele('INPUT_DIR', ' ')
-	    		.up()
-	    		.ele('OUTPUT_DIR', ' ')
-	    		.up()
-	    		.ele('PATH', ' ')
-	    		.up()
-			.up()
-		  	.end({ pretty: true});
+		var json = {
 
-	  	fs.writeFile(path + 'config.xml', xml, function(err) {}) 
+			main : {
+				server : data.server,
+				port : data.port
+			},
+			easyecg : {
+				easyecgsernum : data.easyecgsernum,
+				easyecginputdir : data.easyecginputdir,
+				easyecgoutputdir : data.easyecgoutputdir,
+				easyecgpath : data.easyecgpath
+			}
+			
+		}
+
+	  	fs.writeFile('./config.json', JSON.stringify(json), function(err) {}) 
+	}
+
+	let readConfig = () => {
+		return new Promise(function(resolve,reject){
+            if (!fs.existsSync('./config.json')) { resolve(['']); return;}
+            fs.readFile('./config.json', 'utf8', function(err, data) {
+                resolve(JSON.parse(data));
+            });  
+        })   
+	}
+
+	let runAtesMedicaExe = () => {
+	  	exec(atesExe, function(err, data) {  
+	  		if(err!== null) api.GetLogger.write(`Ошибка при запуске программы Ates. Проверьте в настройках путь к программе.`);                
+	    });
 	}
 
     api.GetExpress().post('/tis/run/ecg.rest', jsonParser, function(req, res) {
@@ -104,20 +111,29 @@ exports.Run = function(config,api, callback){
         if (req.method === 'POST') {
             var form = new multiparty.Form();
             form.parse(req, function(err, fields, files) {
-                build(JSON.parse(fields.jsonData[0]));
+            	runAtesMedicaExe();
+                buildAtesXml(JSON.parse(fields.jsonData[0]));
                 res.send({ success: true});
             });
             return;
-
         }
     });
 
-    api.GetExpress().post('/tis/run/config.write', jsonParser, function(req, res) {
+    api.GetExpress().post('/tis/writeConfig', jsonParser, function(req, res) {
         if (!req.body) return res.send({ success: false, message: "Invalid arguments" });
         if (req.method === 'POST') {
             buildConfig(req.body);
-            res.send({ success: true});
+            res.send({ success: true} );
             return;
+        }
+    });
+
+    api.GetExpress().post('/tis/readConfig', jsonParser, function(req, res) {
+        if (!req.body) return res.send({ success: false, message: "Invalid arguments" });
+        if (req.method === 'POST') {
+            readConfig().then(result=>{
+            	res.send({ success: true , msg : result} );
+            })
         }
     });
 
