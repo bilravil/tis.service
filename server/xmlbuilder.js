@@ -59,7 +59,7 @@ exports.Run = function(config,api, callback){
 	    		.up()
 	    		.ele('PAT_DIAST', ' ')
 	    		.up()
-	    		.ele('PAT_NOTES', ' ')
+	    		.ele('PAT_NOTES', data.task.uuid)
 	    		.up()
 	    		.up()
 			.ele('EXAM_FILE_FORMAT', 'ECG')
@@ -102,7 +102,7 @@ exports.Run = function(config,api, callback){
 
 	let runAtesMedicaExe = () => {
 	  	exec(atesExe, function(err, data) {  
-	  		if(err!== null) api.GetLogger.write(`Ошибка при запуске программы Ates. Проверьте в настройках путь к программе.`);                
+	  		if(err!== null) api.GetLogger().write(`Ошибка при запуске программы Ates. Проверьте в настройках путь к программе.`);                
 	    });
 	}
 
@@ -112,7 +112,14 @@ exports.Run = function(config,api, callback){
             var form = new multiparty.Form();
             form.parse(req, function(err, fields, files) {
             	runAtesMedicaExe();
-                buildAtesXml(JSON.parse(fields.jsonData[0]));
+            	var data = JSON.parse(fields.jsonData[0]);
+                buildAtesXml(data);
+                let param = {
+                	uuidTest : data.task.uuid,
+                	uuidPatient : data.task['patient.uuid'],
+                	state: 'registered'
+                }
+                api.GetDB().test.Create(param);
                 res.send({ success: true});
             });
             return;

@@ -15,17 +15,32 @@ const sessionParser = session({ secret: 'keyboard cat', resave: true, saveUninit
 const http = require('http').Server(app);
 
 const config = require('./config.json');
-var fs = require('fs');
+const fs = require('fs');
 const logger = require('./server/logger.js');
-
+const path = require('path');
 const xmlbuilder = require('./server/xmlbuilder.js');
 const sender = require('./server/sender.js');
-
+const db = require('./server/db/index.js');
+const localFolder = config.easyecg.easyecgoutputdir+'/';
 var api = {
+    GetDB : function() {return db.GetDB();},
     GetHttp: function() { return http; },
     GetExpress: function () { return app; },  
     GetLogger : function () { return logger;} 
 };
+
+function deleteExistFiles(){
+    fs.readdirSync(localFolder).forEach(file =>{
+        if(path.extname(file) === '.ecg'){
+            let path = localFolder + file;
+            db.GetDB().test.Get({filename: path}).then(
+                res=>{ 
+                    if(res !== undefined) if(res.state === 'sended') fs.unlink(path);
+                })
+        };   
+    })
+        
+}
 
 function Http(port, callback) {
 	app.all('*', function(req, res, next) {
@@ -63,8 +78,9 @@ function Http(port, callback) {
 
 
 Http(config.main.port, function () { console.log('http service started on port ' + config.main.port + "!");  });
-xmlbuilder.Run(config,api, function(){})
-sender.Run(config,api, function(){})
+xmlbuilder.Run(config,api, function(){});
+sender.Run(config,api, function(){});
+db.Run(api, function(msg){console.log(msg);deleteExistFiles();});
 
 process.on('uncaughtException', function(err) {
     console.log(err);
