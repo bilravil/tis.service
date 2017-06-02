@@ -196,3 +196,6 @@ qwqqwqwq
 Обнаружен файл ЭКГ - C:/ECGReceiver/Out/АБДУРАХМАНОВА_КЛАРА_Exam_1_1.ecg
 Файл отправлен на сервер - C:/ECGReceiver/Out/АБДУРАХМАНОВА_КЛАРА_Exam_1_1.ecg
 Ответ от сервера - {"success":true,"message":""}
+Обнаружен файл ЭКГ - C:/ECGReceiver/Out/АБДУРАХМАНОВА_КЛАРА_Exam_1_1.ecg
+Файл отправлен на сервер - C:/ECGReceiver/Out/АБДУРАХМАНОВА_КЛАРА_Exam_1_1.ecg
+Ответ от сервера - {"success":true,"message":""}

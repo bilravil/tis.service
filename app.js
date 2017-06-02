@@ -67,6 +67,7 @@ function Http(port, callback) {
     app.post('/tis/getLogs', jsonParser, function(req, res) {
         if (!fs.existsSync('./logs.txt')) { res.send({ success: true , message : ''}); }
             fs.readFile('./logs.txt', 'utf8', function(err, data) {
+                data = data.reverse();
                 res.send({ success: true , message : data}); 
             }); 
     });

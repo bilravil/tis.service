@@ -4,12 +4,14 @@ const request = require('request');
 
 exports.Run = function(config,api, callback){  
 
-	const localFolder = config.easyecg.easyecgoutputdir+'/';
-	const remoteServer = config.main.server;
+	var localFolder = config.easyecg.easyecgoutputdir+'/';
+	var remoteServer = config.main.server;
 
 	const logFile = localFolder + '/log.txt';
 
 	let check = () =>{
+		localFolder = config.easyecg.easyecgoutputdir+'/';
+		remoteServer = config.main.server;
 		fs.readdirSync(localFolder).forEach(file => {
 			if(path.extname(file) === '.ecg'){
 				let path = localFolder + file;
@@ -72,8 +74,8 @@ exports.Run = function(config,api, callback){
 
 	function parse(filepath) {
 		var buffer = fs.readFileSync(filepath);
-	    var Iconv = require('iconv').Iconv;
-	    var iconv = new Iconv('windows-1251', 'utf-8');
+	    //var Iconv = require('iconv').Iconv;
+	    //var iconv = new Iconv('windows-1251', 'utf-8');
 
 	    var patient_key = [
 	        { key_ates: "::p01:Patient last name:", key: "first" },
@@ -135,7 +137,7 @@ exports.Run = function(config,api, callback){
 		var index = buffer.lastIndexOf("::e17:Examine data:");
 		if (index == -1) return Promise.reject("bad format");
 		index += 21;
-		var header = iconv.convert(buffer.slice(0, index )).toString();
+		var header = (buffer.slice(0, index )).toString();
 		
 		
 		header = header.split("\n");
