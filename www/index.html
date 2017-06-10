@@ -12,11 +12,11 @@
     <script>
         var app = angular.module('App', []);
         app.controller('IndexCtrl', function ($scope, $http) {
-
             $scope.writeConfig = function(){
                 var request = {  
                     server: $scope.server, 
                     port: $scope.port,
+                    version: $scope.version,
                     easyecgsernum: $scope.easyecgsernum,
                     easyecginputdir: $scope.easyecginputdir,
                     easyecgoutputdir: $scope.easyecgoutputdir,
@@ -35,6 +35,7 @@
                     success(function (result, status, headers, config) {
                             $scope.server = result.msg.main.server;
                             $scope.port = result.msg.main.port;
+                            $scope.version = result.msg.main.version;
                             $scope.easyecgsernum = result.msg.easyecg.easyecgsernum;
                             $scope.easyecginputdir = result.msg.easyecg.easyecginputdir;
                             $scope.easyecgoutputdir = result.msg.easyecg.easyecgoutputdir;
@@ -80,6 +81,10 @@
                 <div class="form-group">
                     <label> Локальный порт</label>
                     <input type="text" class="form-control" ng-model="port">
+                </div>
+                <div class="form-group">
+                    <label> Версия</label>
+                    <input type="text" class="form-control" ng-model="version" readonly>
                 </div>
                 <button class="btn btn-primary" type="button" ng-click="writeConfig()">Применить</button>
             </div>

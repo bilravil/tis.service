@@ -1,1 +1,1 @@
-{"main":{"server":"http://localhost:8084","port":"8090"},"easyecg":{"easyecgsernum":"311029","easyecginputdir":"C:/ECGReceiver/Xml/In","easyecgoutputdir":"C:/ECGReceiver/Out","easyecgpath":"C:\\Program Files (x86)\\ATES Medica\\Easy ECG Rest\\Bin\\ht_ecgv.exe"}}
+{"main":{"server":"http://localhost:8084","port":"8090","version":"1.0"},"easyecg":{"easyecgsernum":"311029","easyecginputdir":"C:/ECGReceiver/Xml/In","easyecgoutputdir":"C:/ECGReceiver/Out","easyecgpath":"C:\\Program Files (x86)\\ATES Medica\\Easy ECG Rest\\Bin\\ht_ecgv.exe"}}
