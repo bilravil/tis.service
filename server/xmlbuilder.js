@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 var multiparty = require('multiparty');
 var fs = require('fs');
-var exec = require('child_process').execFile;
+var elevate = require('node-windows').elevate;
 
 exports.Run = function (config, api, callback) {
 
@@ -13,7 +13,7 @@ exports.Run = function (config, api, callback) {
 	var configPath = './';
 	var atesExe = config.easyecg.easyecgpath;
 
-	var buildAtesXml = function buildAtesXml(data) {
+	function buildAtesXml(data) {
 		var sex = data.task['patient.sex'] === 1 ? 'М' : 'Ж';
 		var tmp = data.task['patient.birthday'].toString();
 		var birthday = tmp.substring(6) + '.' + tmp.substring(4, 6) + '.' + tmp.substring(0, 4);
@@ -74,9 +74,8 @@ exports.Run = function (config, api, callback) {
 		fs.writeFile(path + data.task['patient.uuid'] + '.xml', xml, function (err) {});
 	};
 
-	var buildConfig = function buildConfig(data) {
+	function buildConfig(data) {
 		var json = {
-
 			main: {
 				server: data.server,
 				port: data.port,
@@ -94,7 +93,7 @@ exports.Run = function (config, api, callback) {
 		fs.writeFile('./config.json', JSON.stringify(json), function (err) {});
 	};
 
-	var readConfig = function readConfig() {
+	function readConfig() {
 		return new Promise(function (resolve, reject) {
 			if (!fs.existsSync('./config.json')) {
 				resolve(['']);return;
@@ -105,8 +104,10 @@ exports.Run = function (config, api, callback) {
 		});
 	};
 
-	var runAtesMedicaExe = function runAtesMedicaExe() {
-		exec(atesExe, function (err, data) {
+	function runAtesMedicaExe() {
+		atesExe = config.easyecg.easyecgpath;
+		atesExe = '\"' + atesExe + '\"'; 
+		elevate(atesExe, function (err, data) {
 			if (err !== null) api.GetLogger().write('Ошибка при запуске программы Ates. Проверьте в настройках путь к программе.');
 		});
 	};
@@ -114,7 +115,6 @@ exports.Run = function (config, api, callback) {
 	api.GetExpress().post('/tis/run/ecg.rest', jsonParser, function (req, res) {
 		path = config.easyecg.easyecginputdir;
 		configPath = './';
-		atesExe = config.easyecg.easyecgpath;
 		if (!req.body) return res.send({ success: false, message: "Invalid arguments" });
 		if (req.method === 'POST') {
 			var form = new multiparty.Form();
@@ -142,7 +142,6 @@ exports.Run = function (config, api, callback) {
 			return;
 		}
 	});
-
 	api.GetExpress().post('/tis/readConfig', jsonParser, function (req, res) {
 		if (!req.body) return res.send({ success: false, message: "Invalid arguments" });
 		if (req.method === 'POST') {

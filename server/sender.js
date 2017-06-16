@@ -11,14 +11,16 @@ exports.Run = function (config, api, callback) {
 
 	var logFile = localFolder + '/log.txt';
 
-	var check = function check() {
+	function check() {
 		if(fs.existsSync(localFolder)){
 			localFolder = config.easyecg.easyecgoutputdir + '/';
 			remoteServer = config.main.server;
 			fs.readdirSync(localFolder).forEach(function (file) {
 				if (path.extname(file) === '.ecg') {
+					console.log(1);
 					var _path = localFolder + file;
 					api.GetDB().test.Get({ filename: _path }).then(function (res) {
+						console.log(res);
 						if (res === undefined) send(_path);else if (res.state !== 'sended') send(_path);
 					});
 				}
@@ -27,7 +29,7 @@ exports.Run = function (config, api, callback) {
 		
 	};
 
-	var send = function send(filepath) {
+	function send(filepath) {
 		var patient = parse(filepath).patient;
 		var uuidPatient = patient.code;
 		var uuidTest = patient.notes;

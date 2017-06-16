@@ -23,7 +23,8 @@ exports.Run = function (callback) {
     var sender = require('./server/sender.js');
     var db = require('./server/db/index.js');
     var localFolder = config.easyecg.easyecgoutputdir + '/';
-
+    var path = require('path');
+    
     var api = {
         GetDB: function GetDB() {
             return db.GetDB();

@@ -24,17 +24,20 @@ var svc = new Service({
 	script: pth
 });
 
+var wincmd = require('node-windows');
+
 svc.on('install', function () {
 	search();
 	svc.start();
+	fs.appendFile('./1.txt', 'service install' , function (err) {});
 });
 
 svc.on('alreadyinstalled', function () {
-	console.log(2);
+	fs.appendFile('./1.txt', 'service alreadyinstalled' , function (err) {});
 });
 
 svc.on('invalidinstallation', function () {
-	console.log(1);
+	fs.appendFile('./1.txt', 'service invalidinstallation' , function (err) {});
 });
 
 svc.on('uninstall', function () {

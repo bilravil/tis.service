@@ -20,6 +20,8 @@ function checkUpdates(callback) {
                 var file = fs.createWriteStream("update.zip");
                 response.pipe(file);
                 fs.createReadStream('./update.zip').pipe(unzip.Extract({ path: './' }));
+                config.main.version = remoteBody;
+                fs.writeFile('./config.json', JSON.stringify(config), function (err) {});
                 callback(true);
             });
         }else callback(true);

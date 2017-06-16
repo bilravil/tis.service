@@ -1,1 +1,1 @@
-node service.js
+node "%~dp0\service.js" %*
