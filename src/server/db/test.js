@@ -1,3 +1,6 @@
+/*
+	create Test table on  SQLite DB through Sequelize ORM
+*/
 var Sequelize = require('sequelize');
 module.exports = function(engine){
 	var Test = engine.define('test', {

@@ -1,0 +1,12 @@
+Windows Registry Editor Version 5.00 
+
+[HKEY_CLASSES_ROOT\tis]
+@="URL:tis Protocol"
+"URL Protocol"="" 
+
+[HKEY_CLASSES_ROOT\tis\shell]
+
+[HKEY_CLASSES_ROOT\tis\shell\open]
+
+[HKEY_CLASSES_ROOT\tis\shell\open\command]
+@="\\"C:\\Program Files\\nodejs\\\\node.exe" \\ "c:\\projects\\tis.service\\start.js" \"%1\""

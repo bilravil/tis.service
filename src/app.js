@@ -80,11 +80,12 @@ exports.Run = function (callback) {
         app.post('/tis/getLogs', jsonParser, function (req, res) {
             if (!fs.existsSync('./logs.txt')) {
                 res.send({ success: true, message: '' });
+                return;
             }
             fs.readFile('./logs.txt', 'utf8', function (err, data) {
-            //data = data.reverse();
-            res.send({ success: true, message: data });
-        });
+                //data = data.reverse();
+                res.send({ success: true, message: data });
+            });
         });
 
         http.listen(port, function () {
@@ -93,16 +94,15 @@ exports.Run = function (callback) {
     }
 
     Http(config.main.port, function () {
-        console.log('http service started on port ' + config.main.port + "!");
+        //console.log('http service started on port ' + config.main.port + "!");
         logger.write('Сервис по отправке ЭКГ запущен.');
     });
     xmlbuilder.Run(config, api, function () {});
     sender.Run(config, api, function () {});
     db.Run(api, function (msg) {
-        console.log(msg);deleteExistFiles();
+        //console.log(msg);deleteExistFiles();
     });
 
-    //setInterval(checkUpdates,10000);
 
     process.on('uncaughtException', function (err) {
         console.log(err);
